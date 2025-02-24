@@ -45,7 +45,84 @@ namespace rajz_teszt1
             AddFillButton();
             AddEraserButton();
             AddUndoButton();
+            AddSaveButton();
+            AddLoadButton();
+
+
         }
+        private void AddLoadButton()
+        {
+            Button loadButton = new Button();
+            loadButton.Text = "📂 Kép Betöltése";
+            loadButton.Width = 150;
+            loadButton.Height = 50;
+            loadButton.FlatStyle = FlatStyle.Flat;
+            loadButton.ForeColor = Color.White;
+            loadButton.BackColor = Color.FromArgb(70, 70, 70);
+            loadButton.Click += LoadButton_Click;
+            controlPanel.Controls.Add(loadButton);
+        }
+        private void LoadButton_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "PNG Képfájl|*.png";
+                openFileDialog.Title = "Kép betöltése";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        Bitmap loadedImage = new Bitmap(openFileDialog.FileName);
+                        using (Graphics g = Graphics.FromImage(canvas))
+                        {
+                            g.Clear(Color.White); // Vászon törlése
+
+                            int x = (canvas.Width - loadedImage.Width) / 2;
+                            int y = (canvas.Height - loadedImage.Height) / 2;
+
+                            g.DrawImage(loadedImage, x, y, loadedImage.Width, loadedImage.Height);
+                        }
+                        this.Invalidate(); // Képernyő frissítése
+                        MessageBox.Show("A kép sikeresen betöltve!", "Betöltés", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Hiba történt a kép betöltésekor: " + ex.Message, "Hiba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void AddSaveButton()
+        {
+            Button saveButton = new Button();
+            saveButton.Text = "💾 Mentés";
+            saveButton.Width = 150;
+            saveButton.Height = 50;
+            saveButton.FlatStyle = FlatStyle.Flat;
+            saveButton.ForeColor = Color.White;
+            saveButton.BackColor = Color.FromArgb(70, 70, 70);
+            saveButton.Click += SaveButton_Click;
+            controlPanel.Controls.Add(saveButton);
+        }
+
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "PNG Képfájl|*.png";
+                saveFileDialog.Title = "Kép mentése";
+                saveFileDialog.FileName = "rajz.png";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    canvas.Save(saveFileDialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                    MessageBox.Show("A kép sikeresen elmentve!", "Mentés", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
 
         private void AddControlPanel()
         {
@@ -54,7 +131,7 @@ namespace rajz_teszt1
             controlPanel.Width = 200;
             controlPanel.Height = this.ClientSize.Height;
             controlPanel.BackColor = Color.FromArgb(50, 50, 50);
-            controlPanel.Dock = DockStyle.Right;
+            controlPanel.Dock = DockStyle.Left;
             controlPanel.Padding = new Padding(10);
             controlPanel.AutoSize = true;
             this.Controls.Add(controlPanel);
